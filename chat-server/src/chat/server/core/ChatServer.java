@@ -12,6 +12,9 @@ import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener {
 
@@ -21,22 +24,24 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     private Vector<SocketThread> clients = new Vector<>();      // Те сокеты, которые мы создаем, нужно складывать в список, т.е. у нас может подключится много клиентов и нус должен быть спиоок клиентов// создаем потоко-безопасный аналог эррей-листа// вектор с клиентами, в вектор мы складываем сокет-треды, т.е. все те треды, которые МЫ с вами, как сервак, нагенерили с НАШЕЙ стороны, это сокет-треды НАШИ, которые мы сгенерили и они будет соеденины с теми сокет-тредыми, которые на клиенте. Это НЕ сокет-треды клиентов. Это сокет-треды, которые сгенерил наш сервак
     // у нас существовала большая проблема, что внутри vector у нас лежат как авторизованные клиенты, так и не авторизованные - это плохо // Как узнать авторизован поток или нет ? => никак , т.к. потому что ServerSocket, также как и SocketThread - эти все вещи у нас отвязаны от нашего чата, они вообще нечего не знают о том, чтоо у нас будут какие-то там nickname или ещё что-то такое  // Как выйти из этой ситуации ? => нам нужен свой собственный класс, который будет символизировать нашего подключенного пользователя с набором флажков (# является он там авторизованым или нет, поле с nickname добавить ему и тд)
     private SocketThread socketThread;
+    private ExecutorService executorService = Executors.newCachedThreadPool();;                      ////////////////////////////////////////////////
     public ChatServer(ChatServerListener listener) {
         this.listener = listener;
     }
 
     public void start(int port) {
-        if (server != null && server.isAlive())
+        if (server != null && server.isAlive())          /////////////////////////////////////////  if (server != null && server.t.isAlive())                                                          // Метод isAlive() возвращает логическое значение true, если поток, для кото­рого он вызван, еще исполняется.
             putLog("Server already started");
-        else
+        else {
             server = new ServerSocketThread(this, "Server", port, 2000);
+        }
     }
 
     public void stop() {
-        if (server == null || !server.isAlive()) {
+        if (server == null || !server.isAlive()) {                      //////////////////////////!server.t.isAlive()
             putLog("Server is not running");
         } else {
-            server.interrupt();
+            server.interrupt();   //////////////////////////////////////////server.t.interrupt();
         }
     }
 
@@ -80,8 +85,8 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void onSocketAccepted(ServerSocketThread thread, ServerSocket server, Socket socket) {  // ServerSocketThread thread - где всё произошло зачачатие Socket, ServerSocket server - кто зачал Socket, Socket socket - результат этого зачатия
         putLog("Client connected");
         String name = "SocketThread " + socket.getInetAddress() + ":" + socket.getPort();
-        new ClientThread(this, name, socket);                                              // ((SocketThread поменяли на ClienThread))передаем нас, имя, и сокет в который нужно будет обурнуть наш этот поток // получается, что на каждое новое соединение у нас генерится новый поток // создаем ClientThread
-
+        //new ClientThread(this, name, socket);                                              // ((SocketThread поменяли на ClienThread))передаем нас, имя, и сокет в который нужно будет обурнуть наш этот поток // получается, что на каждое новое соединение у нас генерится новый поток // создаем ClientThread
+        executorService.submit(new ClientThread(this, name, socket));          /////////////////////////////
     }
 
     @Override
