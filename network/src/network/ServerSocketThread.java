@@ -9,6 +9,8 @@ public class ServerSocketThread extends Thread {                                
 
     private int port;
     private int timeout;
+    //private String name;            ////////////////////////////
+    //public Thread t;                /////////////////////////
     ServerSocketThreadListener listener;                                                                    // что-бы нас кто-то слушал
 
     public ServerSocketThread(ServerSocketThreadListener listener, String name, int port, int timeout) {
@@ -16,6 +18,8 @@ public class ServerSocketThread extends Thread {                                
         this.port = port;
         this.timeout = timeout;
         this.listener = listener;                                                                           // у нас должен быть слушатель событий, которые мы генерим
+       // this.name = name;                                        ////////////////////////
+       // t = new Thread(this, name);                       //////////////////////////////////////
         start();
     }
 
@@ -25,7 +29,7 @@ public class ServerSocketThread extends Thread {                                
         try (ServerSocket server = new ServerSocket(port)) {                                               // передаем порт // сервер будет ожидать входящее соединение по accept,
             server.setSoTimeout(timeout);                                                                  // устанавливаем у ServerSocket TimeOut, это означет, что мы конечно же будем в accept ожидать подключение, но переодически, когда у нас наступает TimeOut нас будет отпускать из этого accept для дальнейшего прохождения(естественно мы зациклимся, но иногда будет отпускать на проверку флага "!isInterrupted()" с эти самым TimeOut)
             listener.onServerSocketCreated(this, server);                                           // listener, server created
-            while (!isInterrupted()) {                                                                     // будем ожидать бесконечное кол-во клиентов(while), пока его не прервут
+            while (!isInterrupted()) {                //////////////////////while (!cur.isInterrupted()) {                             // будем ожидать бесконечное кол-во клиентов(while), пока его не прервут
                 Socket socket;                                                                             // создали экземпляр
                 try {
                     socket = server.accept();                                                              // вызываем accept

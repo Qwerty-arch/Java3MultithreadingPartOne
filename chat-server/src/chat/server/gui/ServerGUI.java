@@ -15,7 +15,7 @@ public class ServerGUI extends JFrame implements ActionListener, Thread.Uncaught
     private static final int WIDTH = 600;
     private static final int HEIGHT = 300;
 
-    private final ChatServer chatServer = new ChatServer((ChatServerListener) this);  // можем отдельны передать какой-то объект, но и можем простосказать, что "мы"
+    private final ChatServer chatServer = new ChatServer((ChatServerListener) this);  // можем отдельны передать какой-то объект, но и можем просто сказать, что "мы"
     private final JButton btnStart = new JButton("Start");
     private final JButton btnStop = new JButton("Stop");
     private final JPanel panelTop = new JPanel(new GridLayout(1, 2));
@@ -65,15 +65,15 @@ public class ServerGUI extends JFrame implements ActionListener, Thread.Uncaught
     }
 
     @Override
-    public void uncaughtException(Thread t, Throwable e) { // наш собственный обрабочк всех исключений(метод из интерфейса)
+    public void uncaughtException(Thread t, Throwable e) {                                                     // наш собственный обрабочк всех исключений(метод из интерфейса)
         e.printStackTrace();
         String msg;
-        StackTraceElement[] ste = e.getStackTrace();       // чтобы достать StackTrace исключение нам нужен массив из StackTrace элементов, его можно достать из Throwable
+        StackTraceElement[] ste = e.getStackTrace();                                                           // чтобы достать StackTrace исключение нам нужен массив из StackTrace элементов, его можно достать из Throwable
         msg = "Exception in " + t.getName() + " " +
                 e.getClass().getCanonicalName() + ": " +
                 e.getMessage() + "\n\t at " + ste[0];
         JOptionPane.showMessageDialog(this, msg, "Exception", JOptionPane.ERROR_MESSAGE); // диалоговое окно для оповещения пользователя
-        System.exit(1); // закрывем окно
+        System.exit(1);                                                                                  // закрывем окно
     }
 
     @Override

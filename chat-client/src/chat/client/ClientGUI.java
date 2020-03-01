@@ -84,7 +84,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         try {
             Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText())); // создаем новый Soket (сетевая составляющая клиента); tfIPAddress.getText() - забрали IP адрес из нашего поля с IP адресом, Integer.parseInt(tfPort.getText()) - получаем порт
             socketThread = new SocketThread(this, "Client", socket);                // как только соединились нам нужно создать новый SocketThread, т.е. сам сокет есть, теперь Thread // listener - это мы(this), name - клиент, socket - тот, что только что сгенерили
-
+            socketThread.getT().start();
         } catch (IOException e) {
             showException(Thread.currentThread(), e);
         }
